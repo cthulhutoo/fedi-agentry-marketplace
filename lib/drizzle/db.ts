@@ -1,7 +1,17 @@
-import { drizzle } from "drizzle-orm/better-sqlite3"
-import Database from "better-sqlite3"
+import { drizzle } from "drizzle-orm/node-postgres"
+import { Client } from "pg"
 import * as schema from "./schema"
 
-const sqlite = new Database("./sqlite.db")
-export const db = drizzle(sqlite, { schema })
-export const dbClient = Promise.resolve(db)
+export async function connectDbClient() {
+  const client = new Client({
+    connectionString: process.env.DATABASE_URL,
+  })
+
+  await client.connect()
+
+  const db = drizzle(client, { schema })
+
+  return db
+}
+
+export const dbClient = connectDbClient()
