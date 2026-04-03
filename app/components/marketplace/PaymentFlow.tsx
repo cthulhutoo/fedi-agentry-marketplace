@@ -39,7 +39,7 @@ export function PaymentFlow({ listing, buyerAgentId, onComplete, onCancel }: Pay
       // Create escrow contract via Agentry
       const contract = await agentry.createEscrowContract({
         client_id: buyerAgentId,
-        agent_id: listing.seller.agentId || listing.seller.cuid || 'unknown',
+        agent_id: listing.seller.agentId || listing.seller.id || 'unknown',
         amount_sats: listing.priceSats,
         mint_url: listing.mintUrl || 'https://mint.minibits.cash/Bitcoin',
         client_pubkey: buyerPubkey,
