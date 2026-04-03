@@ -1,98 +1,54 @@
 "use client"
 
-import { styled } from "react-tailwind-variants"
+import { ReactNode } from "react"
 
-const Flex = styled("div", {
-  base: "flex flex-row",
-  variants: {
-    align: {
-      unset: "",
-      start: "items-start",
-      end: "items-end",
-      center: "items-center",
-    },
-    justify: {
-      unset: "",
-      start: "justify-start",
-      end: "justify-end",
-      center: "justify-center",
-      between: "justify-between",
-    },
-    gap: {
-      unset: "",
-      0: "gap-0",
-      1: "gap-1",
-      2: "gap-2",
-      4: "gap-4",
-      6: "gap-6",
-      8: "gap-8",
-      16: "gap-16",
-    },
-    p: {
-      unset: "",
-      0: "p-0",
-      1: "p-1",
-      2: "p-2",
-      4: "p-4",
-      6: "p-6",
-      8: "p-8",
-      16: "p-16",
-    },
-    center: {
-      true: "justify-center items-center",
-    },
-    row: {
-      true: "flex-row",
-    },
-    col: {
-      true: "flex-col",
-    },
-    grow: {
-      true: "flex-grow",
-    },
-    wrap: {
-      true: "flex-wrap",
-    },
-    noBasis: {
-      true: "basis-0",
-    },
-    shrink: {
-      unset: "",
-      true: "flex-shrink",
-      false: "flex-shrink-0",
-    },
-    width: {
-      unset: "",
-      full: "w-full",
-      auto: "w-auto",
-    },
-    height: {
-      unset: "",
-      full: "h-full",
-      auto: "h-auto",
-    },
-    size: {
-      unset: "",
-      full: "w-full h-full",
-      auto: "w-auto h-auto",
-    },
-  },
-  defaultVariants: {
-    align: "unset",
-    justify: "unset",
-    shrink: "unset",
-    width: "unset",
-    height: "unset",
-    p: "unset",
-    size: "unset",
-    center: false,
-    row: false,
-    col: false,
-    grow: false,
-    wrap: false,
-    noBasis: false,
-    gap: 0,
-  },
-})
+interface FlexProps {
+  children: ReactNode
+  col?: boolean
+  center?: boolean
+  gap?: 0 | 1 | 2 | 4 | 6 | 8
+  p?: 0 | 1 | 2 | 4 | 6 | 8
+  grow?: boolean
+  wrap?: boolean
+  width?: "full" | "auto"
+  height?: "full" | "auto"
+  justify?: "start" | "end" | "center" | "between"
+  align?: "start" | "end" | "center"
+  className?: string
+}
 
-export default Flex
+export default function Flex({
+  children,
+  col = false,
+  center = false,
+  gap = 0,
+  p = 0,
+  grow = false,
+  wrap = false,
+  width,
+  height,
+  justify,
+  align,
+  className = "",
+}: FlexProps) {
+  const classes = [
+    "flex",
+    col ? "flex-col" : "flex-row",
+    center && "justify-center items-center",
+    justify && !center && `justify-${justify}`,
+    align && !center && `items-${align}`,
+    gap > 0 && `gap-${gap}`,
+    p > 0 && `p-${p}`,
+    grow && "flex-grow",
+    wrap && "flex-wrap",
+    width === "full" && "w-full",
+    width === "auto" && "w-auto",
+    height === "full" && "h-full",
+    height === "auto" && "h-auto",
+    className,
+  ]
+    .filter(Boolean)
+    .join(" ")
+
+  return <div className={classes}>{children}</div>
+}

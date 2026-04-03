@@ -1,17 +1,16 @@
-import { ComponentProps } from "react"
-import { styled } from "react-tailwind-variants"
-import Flex from "./flex"
+import { ReactNode } from "react"
 
-export default function Container(
-  props: ComponentProps<typeof ContainerInner>,
-) {
-  return (
-    <Flex col center width="full" className="min-h-screen">
-      <ContainerInner {...props} />
-    </Flex>
-  )
+interface ContainerProps {
+  children: ReactNode
+  className?: string
 }
 
-const ContainerInner = styled("div", {
-  base: "flex flex-col gap-4 items-center justify-center grow w-full max-w-[480px]",
-})
+export default function Container({ children, className = "" }: ContainerProps) {
+  return (
+    <div className={`min-h-screen flex flex-col items-center justify-center w-full bg-gray-50 ${className}`}>
+      <div className="flex flex-col gap-4 items-center justify-center grow w-full max-w-[480px] px-4">
+        {children}
+      </div>
+    </div>
+  )
+}

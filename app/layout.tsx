@@ -1,21 +1,17 @@
-import { FediInjectionProvider, ToastProvider } from "@fedibtc/ui"
-import "@fedibtc/ui/dist/index.css"
 import type { Metadata } from "next"
 import { Albert_Sans } from "next/font/google"
+import { Toaster } from "react-hot-toast"
 import Fallback from "./components/fallback"
 import { AuthProvider } from "./components/providers/auth-provider"
 import "./globals.css"
-import { fediModName } from "@/lib/constants"
 
 const albertSans = Albert_Sans({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: fediModName,
-  description: "Securely share sats with your friends",
+  title: "Fedi-Agentry Marketplace",
+  description: "Community marketplace with Bitcoin Lightning payments",
   icons: ["logo.png"],
 }
-
-const env = process.env.NEXT_PUBLIC_ENV
 
 export default function RootLayout({
   children,
@@ -25,20 +21,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={albertSans.className}>
-        <ToastProvider>
-          <FediInjectionProvider
-            fediModName={fediModName}
-            minSupportedAPIVersion="legacy"
-            supportedBitcoinNetworks={{
-              signet: env !== "production",
-              bitcoin: env !== "preview",
-            }}
-          >
-            <AuthProvider>
-              <Fallback>{children}</Fallback>
-            </AuthProvider>
-          </FediInjectionProvider>
-        </ToastProvider>
+        <Toaster position="top-center" />
+        <AuthProvider>
+          <Fallback>{children}</Fallback>
+        </AuthProvider>
       </body>
     </html>
   )

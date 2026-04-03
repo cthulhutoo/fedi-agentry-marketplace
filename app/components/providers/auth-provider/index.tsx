@@ -1,88 +1,57 @@
 "use client"
 
 import { User } from "@/lib/drizzle/schema"
-import { useFediInjectionContext } from "@fedibtc/ui"
-import { Event, UnsignedEvent, getEventHash } from "nostr-tools"
 import { createContext, useContext, useEffect, useState } from "react"
 import { connect } from "./actions/connect"
-import { login } from "./actions/login"
-import { fediModName } from "@/lib/constants"
 
 interface AuthContextType {
   isLoading: boolean
   error: Error | null
   user: User | null
+  nostrPubkey: string | null
+  hasNostr: boolean
 }
 
-interface AuthContextLoading extends AuthContextType {
-  isLoading: true
-  error: null
-  user: null
-}
-
-interface AuthContextError extends AuthContextType {
-  isLoading: false
-  error: Error
-  user: null
-}
-
-interface AuthContextUser extends AuthContextType {
-  isLoading: false
-  error: null
-  user: User
-}
-
-export type AuthContextValue =
-  | AuthContextLoading
-  | AuthContextError
-  | AuthContextUser
-
-export const AuthContext = createContext<AuthContextValue | null>(null)
+const AuthContext = createContext<AuthContextType>({
+  isLoading: true,
+  error: null,
+  user: null,
+  nostrPubkey: null,
+  hasNostr: false,
+})
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [error, setError] = useState<Error | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<Error | null>(null)
   const [user, setUser] = useState<User | null>(null)
-
-  const { nostr, nostrPubkey, status } = useFediInjectionContext()
+  const [nostrPubkey, setNostrPubkey] = useState<string | null>(null)
+  const [hasNostr, setHasNostr] = useState(false)
 
   useEffect(() => {
-    async function attemptLogin() {
+    async function initAuth() {
       try {
-        if (!nostr) throw new Error("No nostr provider found")
-
-        const connectionRes = await connect({ pubkey: nostrPubkey })
-
-        if (!connectionRes.success) throw new Error(connectionRes.message)
-
-        if ("user" in connectionRes.data) {
-          setUser(connectionRes.data.user)
-          setIsLoading(false)
-
-          return
+        // Check for Nostr provider (injected by Fedi or browser extension)
+        if (typeof window !== "undefined" && (window as any).nostr) {
+          setHasNostr(true)
+          const nostr = (window as any).nostr
+          
+          try {
+            const pubkey = await nostr.getPublicKey()
+            setNostrPubkey(pubkey)
+            
+            // Try to connect/login with this pubkey
+            const connectionRes = await connect({ pubkey })
+            
+            if (connectionRes.success && "user" in connectionRes.data) {
+              setUser(connectionRes.data.user)
+            }
+            // If no user found, we'll create one on first interaction
+          } catch (e) {
+            console.log("Nostr auth error:", e)
+            // Continue without auth - user can still browse
+          }
         }
-
-        const evt: UnsignedEvent = {
-          kind: 22242,
-          created_at: Math.floor(Date.now() / 1000),
-          tags: [["challenge", connectionRes.data.sigToken]],
-          content: "Log into " + fediModName,
-          pubkey: nostrPubkey,
-        }
-
-        const event: Omit<Event, "sig"> = {
-          ...evt,
-          id: getEventHash(evt),
-        }
-
-        const signedEvent: Event = (await nostr.signEvent(event)) as Event
-        const loginRes = await login(signedEvent)
-
-        if (!loginRes.success) throw new Error(loginRes.message)
-
-        if (!loginRes.data?.user) throw new Error("No user returned from login")
-
-        setUser(loginRes.data.user)
+        
         setIsLoading(false)
       } catch (e) {
         setError(e as Error)
@@ -90,20 +59,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     }
 
-    if (nostr && status === "success") {
-      attemptLogin()
-    }
-  }, [nostr, nostrPubkey, status])
+    initAuth()
+  }, [])
 
   return (
     <AuthContext.Provider
-      value={
-        {
-          isLoading,
-          error,
-          user,
-        } as AuthContextValue
-      }
+      value={{
+        isLoading,
+        error,
+        user,
+        nostrPubkey,
+        hasNostr,
+      }}
     >
       {children}
     </AuthContext.Provider>
@@ -111,11 +78,5 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 }
 
 export function useAuth() {
-  const context = useContext(AuthContext)
-
-  if (context === null) {
-    throw new Error("useAuth must be used within an AuthProvider")
-  }
-
-  return context
+  return useContext(AuthContext)
 }
