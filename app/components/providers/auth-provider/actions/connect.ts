@@ -4,8 +4,8 @@ import { dbClient } from "@/lib/drizzle/db"
 import { User, session, user } from "@/lib/drizzle/schema"
 import { formatError } from "@/lib/errors"
 import { cookies } from "next/headers"
+import { nip19 } from "nostr-tools"
 import { z } from "zod"
-
 const connectInput = z
   .object({
     pubkey: z.string(),
@@ -86,10 +86,13 @@ export async function connect(args: ConnectInput): Promise<ConnectResult> {
       }
     }
 
+    const npub = nip19.npubEncode(args.pubkey)
+    
     const [newUser] = await db
       .insert(user)
       .values({
         pubkey: args.pubkey,
+        npub: npub,
       })
       .returning()
 
