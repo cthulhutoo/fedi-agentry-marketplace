@@ -1,52 +1,35 @@
 {
-  "name": "fedimodboilerplate",
+  "name": "fedi-agentry-marketplace",
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "bun i && next dev",
-    "build": "bun db:migrate && next build",
+    "dev": "next dev",
+    "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "db:migrate": "bun scripts/migrate.ts",
-    "db:generate": "drizzle-kit generate:pg",
-    "db:sync": "bun db:generate && bun db:migrate",
-    "format": "prettier --ignore-path .gitignore --write \"**/*.{js,ts,tsx}\"",
-    "format:check": "prettier --ignore-path .gitignore --check \"**/*.{js,ts,tsx}\"",
-    "remote-server": "node scripts/remote-server.js"
+    "lint": "next lint"
   },
   "dependencies": {
-    "@fedibtc/tailwind-theme": "1.0.3",
-    "@fedibtc/ui": "1.2.1",
-    "@paralleldrive/cuid2": "^2.2.2",
+    "@cashu/cashu-ts": "^1.0.3",
+    "axios": "^1.6.8",
+    "better-sqlite3": "^9.4.3",
     "drizzle-orm": "^0.30.10",
-    "fedimint-ts": "^0.3.2",
+    "nanoid": "^5.0.7",
     "next": "^14.1.0",
     "nostr-tools": "^2.5.1",
     "pg": "^8.11.5",
     "react": "^18",
     "react-dom": "^18",
-    "react-tailwind-variants": "^1.0.2",
-    "zod": "^3.22.4"
+    "react-hot-toast": "^2.4.1"
   },
   "devDependencies": {
+    "@types/better-sqlite3": "^7.6.9",
     "@types/node": "^20.8.10",
-    "@types/pg": "^8.11.6",
     "@types/react": "^18",
     "@types/react-dom": "^18",
-    "@typescript-eslint/eslint-plugin": "^6.13.1",
-    "@typescript-eslint/parser": "^6.13.1",
-    "autoprefixer": "^10",
     "drizzle-kit": "^0.20.18",
-    "eslint": "^8",
-    "eslint-config-next": "13.5.5",
-    "ngrok": "^5.0.0-beta.2",
     "postcss": "^8",
     "prettier": "^3.0.3",
-    "qrcode": "^1.5.3",
     "tailwindcss": "^3",
     "typescript": "^5.2.2"
-  },
-  "trustedDependencies": [
-    "ngrok"
-  ]
+  }
 }
