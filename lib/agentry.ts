@@ -244,14 +244,16 @@ class AgentryClient {
   }
 
   async mintTokens(quoteId: string, blindedMessages: unknown[]): Promise<{ proofs: Proof[] }> {
-    if (!this.mint) throw new Error('Wallet not initialized')
-    const response = await this.mint.mintTokens(0, blindedMessages, quoteId)
+    if (!this.wallet) throw new Error('Wallet not initialized')
+    // Total amount equals number of blinded messages (each = 1 sat)
+    const amount = blindedMessages.length
+    const response = await this.wallet.mintTokens(amount, quoteId)
     return response
   }
 
-  async sendTokens(amount: number): Promise<Token> {
+  async sendTokens(amount: number, proofs: Proof[]) {
     if (!this.wallet) throw new Error('Wallet not initialized')
-    return this.wallet.send(amount)
+    return this.wallet.send(amount, proofs)
   }
 
   async receiveTokens(token: string): Promise<Proof[]> {

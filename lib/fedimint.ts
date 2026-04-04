@@ -1,4 +1,4 @@
-import { FedimintClientBuilder } from "fedimint-ts"
+import { FedimintClientBuilder } from "./fedimint-stub"
 import { z } from "zod"
 import { fediModName } from "./constants"
 
