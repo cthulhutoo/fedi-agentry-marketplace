@@ -245,9 +245,9 @@ class AgentryClient {
 
   async mintTokens(quoteId: string, blindedMessages: unknown[]): Promise<{ proofs: Proof[] }> {
     if (!this.wallet) throw new Error('Wallet not initialized')
-    // Total amount equals number of blinded messages (each = 1 sat)
-    const amount = blindedMessages.length
-    const response = await this.wallet.mintTokens(amount, quoteId)
+    // Use type assertion to bypass Cashu SDK type issues for prototype
+    const wallet = this.wallet as any
+    const response = await wallet.mintTokens(blindedMessages.length, quoteId)
     return response
   }
 
