@@ -59,6 +59,8 @@ const MOCK_LISTINGS: ListingWithSeller[] = [
     description: '1976 Honda CB750 in great condition. Recently serviced, new tires, runs perfectly. Classic bike with original paint.',
     priceSats: 15000000,
     currency: 'SATS',
+    category: 'vehicles',
+    condition: 'good',
     location: 'Austin, TX',
     lat: '30.2672',
     lng: '-97.7431',
